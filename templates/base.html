@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Blog{% endblock %}</title>
+</head>
+<body>
+    <div id="nav" >
+    </div>
+
+    <div id="content" >
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block scripts%} {% endblock%}
+</body>
+</html>
