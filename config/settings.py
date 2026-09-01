@@ -11,9 +11,16 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from urllib.parse import urlparse
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Variables de entornos y base de datos.
+load_dotenv(BASE_DIR / ".env")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 # Quick-start development settings - unsuitable for production
@@ -56,6 +63,7 @@ INSTALLED_APPS = [
     "taggit",
     "wagtail.api.v2",
     "rest_framework",
+    "django.contrib.postgres",
     # My apps
     "home",
     "accounts",
@@ -100,12 +108,26 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if DATABASE_URL:
+    u = urlparse(DATABASE_URL)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": u.path.lstrip("/"),
+            "USER": u.username,
+            "PASSWORD": u.password,
+            "HOST": u.hostname,
+            "PORT": u.port,
+            "OPTIONS": {"sslmode": "require"},
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
@@ -164,3 +186,28 @@ MEDIA_ROOT = BASE_DIR / "media"
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+# Storages
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+            "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
+            "endpoint_url": os.getenv("AWS_S3_ENDPOINT_URL"),
+            "region_name": os.getenv("AWS_S3_REGION_NAME", "us-east-1"),
+            "custom_domain": os.getenv("AWS_S3_CUSTOM_DOMAIN"),
+            "addressing_style": "path",
+            "signature_version": "s3v4",
+            "default_acl": None,
+            "querystring_auth": False,
+            "file_overwrite": False,
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+WAGTAILIMAGES_MAX_UPLOAD_SIZE = 2 * 1024 * 1024
