@@ -247,3 +247,12 @@ CORS_ALLOWED_ORIGINS = [
     "https://tinta-pausa.pages.dev",
 ]
 CORS_URLS_REGEX = r"^/api/v2/"
+
+# Para visualizar en backend
+base = os.getenv("FRONTEND_URL", "http://localhost:4321").rstrip("/")
+WAGTAIL_HEADLESS_PREVIEW = {
+    "CLIENT_URLS": {
+        "default": f"{base}/preview/",
+    },
+    "REDIRECT_ON_PREVIEW": True,
+}
