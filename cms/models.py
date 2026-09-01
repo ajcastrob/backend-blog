@@ -1,12 +1,47 @@
 from datetime import date
 from django.db import models
 from wagtail.models import Page
+from wagtail.api import APIField
 from wagtail.fields import RichTextField
-from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldPanel, TitleFieldPanel
 from wagtail.search import index
 from taggit.models import TaggedItemBase
 from modelcluster.fields import ParentalKey
 from modelcluster.contrib.taggit import ClusterTaggableManager
+from rest_framework.fields import Field
+from wagtail.rich_text import expand_db_html
+
+
+# Clases que personalizan la API (serializer)
+class ImageUrl(Field):
+    def to_representation(self, value):
+        if not value:
+            return None
+
+        rendition = value.get_rendition("width-1600|format-webp")
+        return {
+            "url": rendition.url,
+            "title": value.title,
+            "width": value.width,
+            "height": value.height,
+        }
+
+
+class APIRichText(Field):
+    def to_representation(self, value):
+        return expand_db_html(value) if value else ""
+
+
+class OwnerProfile(Field):
+    def to_representation(self, value):
+        return {
+            "username": value.username,
+            "first_name": value.first_name,
+            "last_name": value.last_name,
+            "profile_picture": value.profile_picture.url
+            if value.profile_picture
+            else None,
+        }
 
 
 # Create your models here.
@@ -47,6 +82,17 @@ class ArticlePage(Page):
     caption = models.CharField(blank=True, max_length=80)
     tags = ClusterTaggableManager(through="ArticleTag", blank=True)
 
+    # Fields para APi
+    api_fields = [
+        APIField("intro"),
+        APIField("body", serializer=APIRichText()),
+        APIField("date"),
+        APIField("image", serializer=ImageUrl()),
+        APIField("owner", serializer=OwnerProfile()),
+        APIField("caption"),
+        APIField("tags"),
+    ]
+
     def get_author(self):
         return self.owner.username
 
@@ -62,7 +108,7 @@ class ArticlePage(Page):
     template = "blog/article_page.html"
 
     content_panels = [
-        FieldPanel("title"),
+        TitleFieldPanel("title"),
         FieldPanel("intro"),
         FieldPanel("image"),
         FieldPanel("caption"),
