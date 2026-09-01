@@ -54,7 +54,7 @@ def buttondown_webhook(request):
     return HttpResponse(status=204)
 
 
-def verify_signature(payload, signature_header, signing_key):
+def verify_signature(payload: bytes, signature_header: str, signing_key: str) -> bool:
     signature = signature_header.replace("sha256=", "")
     mac = hmac.new(
         signing_key.encode("utf-8"),
