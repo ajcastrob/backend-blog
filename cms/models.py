@@ -10,6 +10,7 @@ from modelcluster.fields import ParentalKey
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from rest_framework.fields import Field
 from wagtail.rich_text import expand_db_html
+from wagtail.snippets.models import register_snippet
 
 
 # Clases que personalizan la API (serializer)
@@ -124,3 +125,22 @@ class ArticleTag(TaggedItemBase):
         on_delete=models.CASCADE,
         related_name="tagged_items",
     )
+
+
+@register_snippet
+class NewsletterSubscriber(models.Model):
+    name = models.CharField(max_length=120)
+    email = models.EmailField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    panels = [
+        FieldPanel("name"),
+        FieldPanel("email"),
+        FieldPanel("created_at", read_only=True),
+    ]
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def str(self):
+        return f"{self.name} <{self.email}>"
