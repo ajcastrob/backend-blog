@@ -11,6 +11,7 @@ from modelcluster.contrib.taggit import ClusterTaggableManager
 from rest_framework.fields import Field
 from wagtail.rich_text import expand_db_html
 from wagtail.snippets.models import register_snippet
+from wagtail_headless_preview.models import HeadlessPreviewMixin
 
 
 # Clases que personalizan la API (serializer)
@@ -70,7 +71,7 @@ class BlogPage(Page):
         return context
 
 
-class ArticlePage(Page):
+class ArticlePage(HeadlessPreviewMixin, Page):
     intro = models.CharField(max_length=80)
     body = RichTextField(blank=True)
     date = models.DateField("Post date", default=date.today)

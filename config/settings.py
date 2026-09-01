@@ -67,8 +67,10 @@ INSTALLED_APPS = [
     "modelcluster",
     "taggit",
     "wagtail.api.v2",
+    "corsheaders",
     "rest_framework",
     "django.contrib.postgres",
+    "wagtail_headless_preview",
     # My apps
     "home",
     "accounts",
@@ -80,6 +82,7 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -226,3 +229,21 @@ STORAGES = {
 }
 
 WAGTAILIMAGES_MAX_UPLOAD_SIZE = 2 * 1024 * 1024
+
+
+# Preview del artículo
+
+WAGTAIL_HEADLESS_PREVIEW = {
+    "CLIENT_URLS": {
+        "default": "http://localhost:4321/preview/",
+        "tinta-pausa.pages.dev": "https://tinta-pausa.pages.dev/preview/",
+    },
+    "REDIRECT_ON_PREVIEW": True,
+}
+
+# Configuración de CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4321",
+    "https://tinta-pausa.pages.dev",
+]
+CORS_URLS_REGEX = r"^/api/v2/"
