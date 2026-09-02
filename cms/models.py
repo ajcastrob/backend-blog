@@ -12,6 +12,7 @@ from rest_framework.fields import Field
 from wagtail.rich_text import expand_db_html
 from wagtail.snippets.models import register_snippet
 from wagtail_headless_preview.models import HeadlessPreviewMixin
+from .forms import ArticlePageForm
 
 
 # Clases que personalizan la API (serializer)
@@ -72,9 +73,11 @@ class BlogPage(Page):
 
 
 class ArticlePage(HeadlessPreviewMixin, Page):
+    base_form_class = ArticlePageForm
     intro = models.CharField(max_length=80)
     body = RichTextField(blank=True)
     date = models.DateField("Post date", default=date.today)
+    quote = models.CharField("Cita", max_length=240, blank=True)
     image = models.ForeignKey(
         "wagtailimages.Image",
         on_delete=models.SET_NULL,
@@ -89,6 +92,7 @@ class ArticlePage(HeadlessPreviewMixin, Page):
         APIField("intro"),
         APIField("body", serializer=APIRichText()),
         APIField("date"),
+        APIField("quote"),
         APIField("image", serializer=ImageUrl()),
         APIField("owner", serializer=OwnerProfile()),
         APIField("caption"),
@@ -115,6 +119,7 @@ class ArticlePage(HeadlessPreviewMixin, Page):
         FieldPanel("image"),
         FieldPanel("caption"),
         FieldPanel("body"),
+        FieldPanel("quote"),
         FieldPanel("date"),
         FieldPanel("tags"),
     ]
