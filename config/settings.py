@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from urllib.parse import urlparse
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -239,10 +240,12 @@ CORS_ALLOWED_ORIGINS = [
 CORS_URLS_REGEX = r"^/api/v2/"
 
 # Para visualizar en backend
-base = os.getenv("FRONTEND_URL", "http://localhost:4321").rstrip("/")
+front = os.getenv("FRONTEND_URL", "http://localhost:4321")
+parsed = urlparse(front)
+origin = f"{parsed.scheme}://{parsed.netloc}" if parsed.scheme else front.rstrip("/")
 WAGTAIL_HEADLESS_PREVIEW = {
     "CLIENT_URLS": {
-        "default": f"{base}/preview/",
+        "default": f"{origin}/preview/",
     },
     "REDIRECT_ON_PREVIEW": True,
 }
