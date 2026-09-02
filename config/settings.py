@@ -231,16 +231,6 @@ STORAGES = {
 WAGTAILIMAGES_MAX_UPLOAD_SIZE = 2 * 1024 * 1024
 
 
-# Preview del artículo
-
-WAGTAIL_HEADLESS_PREVIEW = {
-    "CLIENT_URLS": {
-        "default": "http://localhost:4321/preview/",
-        "tinta-pausa.pages.dev": "https://tinta-pausa.pages.dev/preview/",
-    },
-    "REDIRECT_ON_PREVIEW": True,
-}
-
 # Configuración de CORS
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4321",
